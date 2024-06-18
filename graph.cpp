@@ -11,8 +11,13 @@
 using namespace std;
 
 class Node;
-typedef tuple<double, Node> infoNode;
 typedef vector<Node*> Graph;
+
+class infoNode {
+    public:
+        double dist;
+        Node *node;
+};
 
 class AdyNode {
     public:
@@ -108,6 +113,22 @@ Graph *createGraph(int n_vertices, int n_edges, int seed) {
     return ptr_graph;
 }
 
+void deleteGraph(Graph *graph) {
+    for (int i = 0; i < graph->size(); i++) {
+        AdyNode *actual_ady_node = (*graph)[i]->next_ady_node;
+        AdyNode *ady_node_del = actual_ady_node;
+        delete (*graph)[i];
+        while (actual_ady_node != NULL) {
+            actual_ady_node = actual_ady_node->next_ady_node;
+            if (ady_node_del->info_node != NULL)
+                delete ady_node_del->info_node;
+            delete ady_node_del;
+            ady_node_del = actual_ady_node;
+        }
+    }
+    delete graph;
+}
+
 void printGraph(Graph graph) {
     cout << setprecision(2);
     for (int i = 0; i < graph.size(); i++) {
@@ -121,7 +142,3 @@ void printGraph(Graph graph) {
     }
 }
 
-int main() {
-    Graph *test = createGraph(20, 45, 9);
-    printGraph(*test);
-}
