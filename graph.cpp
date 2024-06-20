@@ -11,6 +11,7 @@
 using namespace std;
 
 class Node;
+class FibNode;
 typedef vector<Node*> Graph;
 
 class infoNode {
@@ -23,7 +24,6 @@ class AdyNode {
     public:
         int index;
         double dist_node;
-        infoNode *info_node;
         AdyNode *next_ady_node;
 };
 
@@ -51,12 +51,12 @@ Graph *createGraph(int n_vertices, int n_edges, int seed) {
         int rand_index = rand() % i;
         double rand_weight = urd(gen);
         AdyNode *ptr_new_ady_node = new AdyNode;
-        AdyNode new_ady_node = {rand_index, rand_weight, NULL, NULL};
+        AdyNode new_ady_node = {rand_index, rand_weight, NULL};
         *ptr_new_ady_node = new_ady_node; 
         graph[i]->next_ady_node = ptr_new_ady_node;
         // add the initial vertice i to the adjacents of new_ady_node
         AdyNode *ptr_node_like_ady = new AdyNode;
-        AdyNode node_like_ady = {i, rand_weight, NULL, NULL};
+        AdyNode node_like_ady = {i, rand_weight, NULL};
         *ptr_node_like_ady = node_like_ady;
         AdyNode *last_ady_node = graph[rand_index]->next_ady_node;
         if (last_ady_node != NULL) {
@@ -93,8 +93,8 @@ Graph *createGraph(int n_vertices, int n_edges, int seed) {
         double rand_weight = urd(gen);
         AdyNode *ptr_ady_node1 = new AdyNode();
         AdyNode *ptr_ady_node2 = new AdyNode();
-        AdyNode ady_node1 = {node1, rand_weight, NULL, NULL};
-        AdyNode ady_node2 = {node2, rand_weight, NULL, NULL};
+        AdyNode ady_node1 = {node1, rand_weight, NULL};
+        AdyNode ady_node2 = {node2, rand_weight, NULL};
         *ptr_ady_node1 = ady_node1;
         *ptr_ady_node2 = ady_node2; 
         AdyNode *actual_ady_node;
@@ -120,8 +120,6 @@ void deleteGraph(Graph *graph) {
         delete (*graph)[i];
         while (actual_ady_node != NULL) {
             actual_ady_node = actual_ady_node->next_ady_node;
-            if (ady_node_del->info_node != NULL)
-                delete ady_node_del->info_node;
             delete ady_node_del;
             ady_node_del = actual_ady_node;
         }
@@ -140,5 +138,5 @@ void printGraph(Graph graph) {
         }
         cout << "NULL" << endl;
     }
+    cout << endl;
 }
-
