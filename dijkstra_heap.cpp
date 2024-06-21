@@ -25,7 +25,7 @@ class HeapNode {
 
 typedef vector<HeapNode*> Heap;
 typedef vector<HeapNode*> NodePair;
-typedef tuple<vector<double>, vector<int>> Dist_Prev;
+typedef pair<vector<double>, vector<int>> Dist_Prev;
 
 class MinHeap {
     public:
@@ -59,15 +59,17 @@ void minHeapify(MinHeap& A, int i){ // O(log n)
     int l = left(i);
     int r = right(i);
     int smallest;
+    //cout << "size: " << A.priqueue[l]->value.node->index;
     if(l < A.size && A.priqueue[l]->value.dist < A.priqueue[i]->value.dist){
         smallest = l;
     } else {
         smallest = i;
     }
+
     if(r < A.size && A.priqueue[r]->value.dist < A.priqueue[smallest]->value.dist){
         smallest = r;
     }
-
+    
     if(smallest != i){
         swap(A.priqueue[i]->pos, A.priqueue[smallest]->pos);
         swap(A.priqueue[i], A.priqueue[smallest]);
@@ -84,14 +86,6 @@ MinHeap heapify(vector<HeapNode*>& A){ // O(n)
     }
 
     int posicion = 0; // Para asegurarnos que cada HeapNode no tenga posicion nula
-    /*
-    for(HeapNode &n : H.priqueue){ // O(n)
-        int index = n.value.node->index;
-        H.nodepair[index] = &n;
-        n.pos = posicion;
-        posicion++;
-    }
-    */
 
     for(int i = 0; i < H.size; i++){
         int index = H.priqueue[i]->value.node->index;
@@ -132,36 +126,36 @@ void decreaseKey(MinHeap& A, int index, double key){
     }
 }
 
-Dist_Prev dijkstraHeap(Node* root, Graph graph){
-    int V = graph.size();
+Dist_Prev dijkstraHeap(Node* root, Graph* graph){
+    int V = graph->size();
     vector<double> dist(V, 999); // Todas las distancias infinitas
     dist[root->index] = 0; // Dist. del nodo raiz 0
 
     vector<int> prev(V); // Previos indefinidos
     prev[root->index] = -1; // Previo a la raiz -1
-
     vector<HeapNode*> Q_temp(V);
 
-    for(Node* node : graph){
+    for(int i = 0; i < graph->size(); i++){
+        Node* node = (*graph)[i];
         if(node->index != root->index){
             infoNode infon = {999, node};
             HeapNode* heapn_ptr = new HeapNode;
             HeapNode heapn;
             heapn.value = infon;
             *heapn_ptr = heapn;
-            Q_temp.push_back(heapn_ptr); 
+            Q_temp[i] = heapn_ptr; 
         } else {
-            infoNode infon = {0, root};
+            infoNode infon = {0, node};
             HeapNode* heapn_ptr = new HeapNode;
             HeapNode heapn;
             heapn.value = infon;
             *heapn_ptr = heapn;
-            Q_temp.push_back(heapn_ptr); 
+            Q_temp[i] = heapn_ptr;
         }
     }
 
     MinHeap Q = heapify(Q_temp); // O(n)
-
+    
     while(Q.size != 0){
         HeapNode* min = extractMin(Q);
         AdyNode* min_neighbor = min->value.node->next_ady_node;
@@ -246,12 +240,12 @@ int main() {
         cout << "(" << n->value.dist << ", " << n->value.node->index << ") posicion: " << n->pos << "\n";
     }
     
-    cout << "\n";
+    cout << endl;
     MinHeap H2 = heapify(A2);
 
     
     for(HeapNode* n : H2.priqueue){
-        cout << "(" << n->value.dist << ", " << n->value.node->index << ") posicion: " << n->pos << "\n";
+        cout << "(" << n->value.dist << ", " << n->value.node->index << ") posicion: " << n->pos << endl;
     }
 
     cout << "\n\nTest referencia de nodo a par que lo representa:\n";
@@ -281,7 +275,7 @@ int main() {
 
     cout << "Heap luego de extraer minimo:\n";
     for(int i = 0; i < H2.size; i++){
-        cout << "(" << H2.priqueue[i]->value.dist << ", " << H2.priqueue[i]->value.node->index << ") posicion: " << H2.priqueue[i]->pos << "\n";
+        cout << "(" << H2.priqueue[i]->value.dist << ", " << H2.priqueue[i]->value.node->index << ") posicion: " << H2.priqueue[i]->pos << endl;
     }
 
     cout << "\nTest referencia de nodo a par que lo representa tras extractMin:\n";
@@ -300,7 +294,31 @@ int main() {
 
     cout << "Heap luego de disminuir clave de nodo 4 a 0.01:\n";
     for(int i = 0; i < H2.size; i++){
-        cout << "(" << H2.priqueue[i]->value.dist << ", " << H2.priqueue[i]->value.node->index << ") posicion: " << H2.priqueue[i]->pos << "\n";
+        cout << "(" << H2.priqueue[i]->value.dist << ", " << H2.priqueue[i]->value.node->index << ") posicion: " << H2.priqueue[i]->pos << endl;
+    }
+
+    cout << "\nTest dijkstraHeap:\n";
+
+    Graph* grafo = createGraph(10, 14, 8);
+
+    cout << "Grafo:\n";
+
+    printGraph(*grafo);
+
+    int index_raiz = 3;
+
+    Dist_Prev camino = dijkstraHeap((*grafo)[index_raiz], grafo);
+
+    cout << "Nodo raiz = "<< index_raiz << "\nArreglo distancias:\n";
+
+    for(int i = 0; i < (*grafo).size(); i++){
+        cout << "Distancia del nodo " << i << " al nodo raiz: " << camino.first[i] << endl;
+    }
+
+    cout << "\nArreglo previos:\n";
+
+    for(int i = 0; i < (*grafo).size(); i++){
+        cout << "Previo del nodo " << i << " : " <<camino.second[i] << endl;
     }
 
 }
