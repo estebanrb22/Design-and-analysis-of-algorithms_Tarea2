@@ -25,6 +25,7 @@ class HeapNode {
 
 typedef vector<HeapNode*> Heap;
 typedef vector<HeapNode*> NodePair;
+typedef tuple<vector<double>, vector<int>> Dist_Prev;
 
 class MinHeap {
     public:
@@ -131,6 +132,55 @@ void decreaseKey(MinHeap& A, int index, double key){
     }
 }
 
+Dist_Prev dijkstraHeap(Node* root, Graph graph){
+    int V = graph.size();
+    vector<double> dist(V, 999); // Todas las distancias infinitas
+    dist[root->index] = 0; // Dist. del nodo raiz 0
+
+    vector<int> prev(V); // Previos indefinidos
+    prev[root->index] = -1; // Previo a la raiz -1
+
+    vector<HeapNode*> Q_temp(V);
+
+    for(Node* node : graph){
+        if(node->index != root->index){
+            infoNode infon = {999, node};
+            HeapNode* heapn_ptr = new HeapNode;
+            HeapNode heapn;
+            heapn.value = infon;
+            *heapn_ptr = heapn;
+            Q_temp.push_back(heapn_ptr); 
+        } else {
+            infoNode infon = {0, root};
+            HeapNode* heapn_ptr = new HeapNode;
+            HeapNode heapn;
+            heapn.value = infon;
+            *heapn_ptr = heapn;
+            Q_temp.push_back(heapn_ptr); 
+        }
+    }
+
+    MinHeap Q = heapify(Q_temp); // O(n)
+
+    while(Q.size != 0){
+        HeapNode* min = extractMin(Q);
+        AdyNode* min_neighbor = min->value.node->next_ady_node;
+        while(min_neighbor != NULL) {
+            if(dist[min_neighbor->index] > (dist[min->value.node->index] + min_neighbor->dist_node)){
+                double new_dist = (dist[min->value.node->index] + min_neighbor->dist_node);
+                dist[min_neighbor->index] = new_dist;
+                prev[min_neighbor->index] = min->value.node->index;
+                decreaseKey(Q, min_neighbor->index, new_dist);
+            }
+            min_neighbor = min_neighbor->next_ady_node;
+        }
+    }
+
+    Dist_Prev ret = {dist, prev};
+
+    return ret;
+}
+
 int main() {
     default_random_engine gen;
     uniform_real_distribution<> urd(0.0 + numeric_limits<double>::epsilon(), 1.0);
@@ -234,6 +284,16 @@ int main() {
         cout << "(" << H2.priqueue[i]->value.dist << ", " << H2.priqueue[i]->value.node->index << ") posicion: " << H2.priqueue[i]->pos << "\n";
     }
 
+    cout << "\nTest referencia de nodo a par que lo representa tras extractMin:\n";
+
+    for(int i = 0; i < H2.size; i++){
+        int node_index = H2.priqueue[i]->value.node->index;
+        cout << "Indice de nodo: " << node_index;
+        HeapNode* par = H2.nodepair[node_index];
+        cout << " Par que lo representa: " << "(" << par->value.dist << ", " << par->value.node->index << ") \n";
+    }
+
+
     cout << "\nTest decreaseKey:\n";
 
     decreaseKey(H2, 4, 0.01);
@@ -241,15 +301,6 @@ int main() {
     cout << "Heap luego de disminuir clave de nodo 4 a 0.01:\n";
     for(int i = 0; i < H2.size; i++){
         cout << "(" << H2.priqueue[i]->value.dist << ", " << H2.priqueue[i]->value.node->index << ") posicion: " << H2.priqueue[i]->pos << "\n";
-    }
-
-    cout << "\nTest referencia de nodo a par que lo representa:\n";
-
-    for(int i = 0; i < H2.size; i++){
-        int node_index = H2.priqueue[i]->value.node->index;
-        cout << "Indice de nodo: " << node_index;
-        HeapNode* par = H2.nodepair[node_index];
-        cout << " Par que lo representa: " << "(" << par->value.dist << ", " << par->value.node->index << ") \n";
     }
 
 }
