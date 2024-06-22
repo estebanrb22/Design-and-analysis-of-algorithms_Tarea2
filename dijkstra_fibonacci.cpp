@@ -240,6 +240,7 @@ info_djikstra *createDistPrev(Graph *graph, int root_index) {
         (aux_d)[i] = INFINITE;
 
     (aux_d)[root_index] = 0;
+    (*prev)[root_index] = -1;
 
     for (int i = root_index + 1; i < n_nodes; i++)
         (aux_d)[i] = INFINITE;
@@ -305,26 +306,6 @@ void printInfoDjikstra(info_djikstra *info, int root_index) {
         cout << "(" << i << ", " << distances[i] << ", " << prevs[i] << ") ";
 }
 
-void test(int n_nodes, int n_edges) {
-    Graph *graph = createGraph(n_nodes, n_edges, 0);
-    printGraph(*graph);
-
-    info_djikstra *info = createDistPrev(graph, n_nodes-1);
-
-    FibHeap *heap = heapifyFibHeap(graph, info->dist);
-    printFibHeap(heap);
-
-    extractMin(heap);
-
-    printFibHeap(heap);
-    printNodesFibHeap(heap);
-
-    decreaseKeyFibHeap(heap, (*heap->v_nodes)[4], 0.05);
-
-    printFibHeap(heap);
-    printNodesFibHeap(heap);
-}
-
 info_djikstra *dijkstra_fibonacci(Graph *graph, int root_index) {
     // create the arrays of distances and prevs, info_dijkstra has all this information.
     info_djikstra *min_tree = createDistPrev(graph, root_index);
@@ -350,6 +331,13 @@ info_djikstra *dijkstra_fibonacci(Graph *graph, int root_index) {
     }
     deleteFibHeap(fibonacciHeap);
     return min_tree;
+}
+
+void test(int n_nodes, int n_edges) {
+    Graph *graph = createGraph(n_nodes, n_edges, 0);
+    printGraph(*graph);
+    info_djikstra *info = dijkstra_fibonacci(graph, n_nodes-1);
+    printInfoDjikstra(info, n_nodes-1);
 }
 
 double calculateMean(vector<double> time) {
@@ -481,5 +469,6 @@ int main() {
        you can use calculateNanoMeanDurationDjikstraFibonacci(i, j, rand_seed), you have to liberate the memory after that. 
        Example: 
         vector<double> *means = calculateNanoMeanDurationDjikstraFibonacci(i, j, rand_seed);
-       */
+        delete means;
+    */
 }
