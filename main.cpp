@@ -49,7 +49,7 @@ int main(){
 
 
         auto start3 = high_resolution_clock::now();
-        info_djikstra* camino_fib = dijkstra_fibonacci(grafo, index_raiz);
+        info_dijkstra* camino_fib = dijkstra_fibonacci(grafo, index_raiz);
         auto stop3 = high_resolution_clock::now();
 
         chrono::duration<double, milli> duration3 = stop3 - start3;
