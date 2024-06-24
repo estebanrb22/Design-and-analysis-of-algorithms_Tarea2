@@ -461,7 +461,7 @@ void executeExperiments(int seed_experiments) {
     vector<vector<vector<double>*>*> *results = calculateAllTimes(rand());
     deleteResultsExperiment(results);
 }
-
+/*
 int main() {
     int random_seed = 10;
     executeExperiments(random_seed);
@@ -471,4 +471,3 @@ int main() {
         vector<double> *means = calculateNanoMeanDurationDjikstraFibonacci(i, j, rand_seed);
         delete means;
     */
-}
