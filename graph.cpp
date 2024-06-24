@@ -1,3 +1,6 @@
+#ifndef GRAPH_CPP
+#define GRAPH_CPP
+
 #include <iostream>
 #include <algorithm>
 #include <vector>
@@ -140,3 +143,5 @@ void printGraph(Graph graph) {
     }
     cout << endl;
 }
+
+#endif // GRAPH_CPP
