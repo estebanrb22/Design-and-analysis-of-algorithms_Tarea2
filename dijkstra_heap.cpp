@@ -7,10 +7,12 @@
 #include <limits>
 #include <random>
 #include <iomanip>
+#include <chrono>
 
 #include "graph.cpp"
 
 using namespace std;
+using namespace std::chrono;
 
 // Implementación de MinHeap basada en el libro
 // “Introduction to Algorithms Third Edition”
@@ -126,9 +128,10 @@ void decreaseKey(MinHeap& A, int index, double key){
     }
 }
 
-Dist_Prev dijkstraHeap(Node* root, Graph* graph){
+Dist_Prev dijkstraHeap(int root_index, Graph* graph){
+    Node* root = (*graph)[root_index];
     int V = graph->size();
-    vector<double> dist(V, 999); // Todas las distancias infinitas
+    vector<double> dist(V, INFINITY); // Todas las distancias infinitas
     dist[root->index] = 0; // Dist. del nodo raiz 0
 
     vector<int> prev(V); // Previos indefinidos
@@ -175,11 +178,12 @@ Dist_Prev dijkstraHeap(Node* root, Graph* graph){
     return ret;
 }
 
+/*
 int main() {
     default_random_engine gen;
     uniform_real_distribution<> urd(0.0 + numeric_limits<double>::epsilon(), 1.0);
 
-    srand(45);
+    srand(2);
     cout << setprecision(3);
 
     vector<HeapNode*> A1;
@@ -299,26 +303,34 @@ int main() {
 
     cout << "\nTest dijkstraHeap:\n";
 
-    Graph* grafo = createGraph(10, 14, 8);
-
+    int i = 3;
+    int j = 4;
+    auto start1 = high_resolution_clock::now();
+    Graph* grafo = createGraph(1 << i, 1 << j, 1298319092);
+    auto stop1 = high_resolution_clock::now();
+    chrono::duration<double, milli> duration1 = stop1 - start1;
+    cout << "Tiempo creacion grafo: " << duration1.count() / 1000 << endl;
     cout << "Grafo:\n";
 
     printGraph(*grafo);
 
     int index_raiz = 3;
-
+    auto start2 = high_resolution_clock::now();
     Dist_Prev camino = dijkstraHeap((*grafo)[index_raiz], grafo);
+    auto stop2 = high_resolution_clock::now();
+
+    chrono::duration<double, milli> duration2 = stop2 - start2;
+    cout << "Tiempo dijkstra: " << duration2.count() / 1000 << endl;
 
     cout << "Nodo raiz = "<< index_raiz << "\nArreglo distancias:\n";
-
+    
     for(int i = 0; i < (*grafo).size(); i++){
         cout << "Distancia del nodo " << i << " al nodo raiz: " << camino.first[i] << endl;
     }
-
+    /*
     cout << "\nArreglo previos:\n";
 
     for(int i = 0; i < (*grafo).size(); i++){
         cout << "Previo del nodo " << i << " : " <<camino.second[i] << endl;
     }
-
-}
+    */
