@@ -34,7 +34,7 @@ class FibHeap {
         vector<FibNode*> *v_nodes;
 };
 
-class info_djikstra {
+class info_dijkstra {
     public: 
         vector<double> *dist;
         vector<int> *prev;
@@ -229,7 +229,7 @@ void decreaseKeyFibHeapByIndex(FibHeap *heap, int index_node, double new_pri) {
     decreaseKeyFibHeap(heap, node, new_pri);
 }
 
-info_djikstra *createDistPrev(Graph *graph, int root_index) {
+info_dijkstra *createDistPrev(Graph *graph, int root_index) {
     /**create the array of distances where dist[root_index] is 0 and all the
        other elements are infinity. */
     int n_nodes = graph->size();
@@ -245,13 +245,13 @@ info_djikstra *createDistPrev(Graph *graph, int root_index) {
     for (int i = root_index + 1; i < n_nodes; i++)
         (aux_d)[i] = INFINITE;
     *dist = aux_d;
-    info_djikstra *info = new info_djikstra();
+    info_dijkstra *info = new info_dijkstra();
     info->dist = dist;
     info->prev = prev;
     return info;
 }
 
-void deleteDistPrev(info_djikstra *info) {
+void deleteDistPrev(info_dijkstra *info) {
     delete info->dist;
     delete info->prev;
     delete info;
@@ -297,7 +297,7 @@ void printNodesFibHeap(FibHeap *heap) {
     cout << endl;
 }
 
-void printInfoDjikstra(info_djikstra *info, int root_index) {
+void printInfoDjikstra(info_dijkstra *info, int root_index) {
     cout << "Arbol de mínimas distancias nodo " << root_index <<" (node, distance, prev):" << endl << endl;
     int n_nodes = info->dist->size();
     vector<double> distances = *info->dist;
@@ -306,9 +306,9 @@ void printInfoDjikstra(info_djikstra *info, int root_index) {
         cout << "(" << i << ", " << distances[i] << ", " << prevs[i] << ") ";
 }
 
-info_djikstra *dijkstra_fibonacci(Graph *graph, int root_index) {
+info_dijkstra *dijkstra_fibonacci(Graph *graph, int root_index) {
     // create the arrays of distances and prevs, info_dijkstra has all this information.
-    info_djikstra *min_tree = createDistPrev(graph, root_index);
+    info_dijkstra *min_tree = createDistPrev(graph, root_index);
 
     // create the fibonacci heap with the graph nodes and their distances.
     FibHeap *fibonacciHeap = heapifyFibHeap(graph, min_tree->dist);
@@ -336,7 +336,7 @@ info_djikstra *dijkstra_fibonacci(Graph *graph, int root_index) {
 void test(int n_nodes, int n_edges) {
     Graph *graph = createGraph(n_nodes, n_edges, 0);
     printGraph(*graph);
-    info_djikstra *info = dijkstra_fibonacci(graph, n_nodes-1);
+    info_dijkstra *info = dijkstra_fibonacci(graph, n_nodes-1);
     printInfoDjikstra(info, n_nodes-1);
 }
 
@@ -390,7 +390,7 @@ vector<double> *calculateNanoMeanDurationDjikstraFibonacci(int pow_nodes, int po
 
             //calculate the time of Djikstra with Fibonacci Heap in graph_i with root_index its root node.
             auto start = chrono::high_resolution_clock::now();
-            info_djikstra *info = dijkstra_fibonacci(graph_i, root_index);
+            info_dijkstra *info = dijkstra_fibonacci(graph_i, root_index);
             auto end = chrono::high_resolution_clock::now();
             auto time_i = chrono::duration_cast<chrono::nanoseconds>(end - start);
             double time_i_d = static_cast<double>(time_i.count());
