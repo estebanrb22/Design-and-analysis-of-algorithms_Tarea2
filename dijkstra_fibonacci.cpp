@@ -15,6 +15,8 @@ using namespace std;
 
 #define INFINITE numeric_limits<double>::infinity(); 
 
+typedef pair<vector<double>, vector<int>> Dist_Prev;
+
 class FibNode {
     public:
         infoNode *value;
@@ -229,28 +231,6 @@ void decreaseKeyFibHeapByIndex(FibHeap *heap, int index_node, double new_pri) {
     decreaseKeyFibHeap(heap, node, new_pri);
 }
 
-info_dijkstra *createDistPrev(Graph *graph, int root_index) {
-    /**create the array of distances where dist[root_index] is 0 and all the
-       other elements are infinity. */
-    int n_nodes = graph->size();
-    vector<double> *dist = new vector<double>(n_nodes);
-    vector<double> aux_d(n_nodes);
-    vector<int> *prev = new vector<int>(n_nodes);
-    for (int i = 0; i < root_index; i++)
-        (aux_d)[i] = INFINITE;
-
-    (aux_d)[root_index] = 0;
-    (*prev)[root_index] = -1;
-
-    for (int i = root_index + 1; i < n_nodes; i++)
-        (aux_d)[i] = INFINITE;
-    *dist = aux_d;
-    info_dijkstra *info = new info_dijkstra();
-    info->dist = dist;
-    info->prev = prev;
-    return info;
-}
-
 void deleteDistPrev(info_dijkstra *info) {
     delete info->dist;
     delete info->prev;
@@ -308,10 +288,17 @@ void printInfoDjikstra(info_dijkstra *info, int root_index) {
 
 info_dijkstra *dijkstra_fibonacci(Graph *graph, int root_index) {
     // create the arrays of distances and prevs, info_dijkstra has all this information.
-    info_dijkstra *min_tree = createDistPrev(graph, root_index);
+    int n_nodes = graph->size();
+    info_dijkstra *min_tree = new info_dijkstra();
+    vector<double> *ptr_dist = new vector<double>(n_nodes);
+    vector<int> *ptr_prev = new vector<int>(n_nodes);
+    vector<double> dist(n_nodes, INFINITY);
+    vector<int> prev(n_nodes);
+    dist[root_index] = 0;
+    prev[root_index] = -1;
 
     // create the fibonacci heap with the graph nodes and their distances.
-    FibHeap *fibonacciHeap = heapifyFibHeap(graph, min_tree->dist);
+    FibHeap *fibonacciHeap = heapifyFibHeap(graph, &dist);
 
     while (fibonacciHeap->n_nodes > 0) {
         infoNode *min_node = extractMin(fibonacciHeap);
@@ -323,13 +310,17 @@ info_dijkstra *dijkstra_fibonacci(Graph *graph, int root_index) {
             double act_root_dist = (*fibonacciHeap->v_nodes)[act_ady_node->index]->value->dist;
             if (new_root_dist < act_root_dist) {
                 decreaseKeyFibHeapByIndex(fibonacciHeap, act_ady_node->index, new_root_dist);
-                (*min_tree->dist)[act_ady_node->index] = new_root_dist;
-                (*min_tree->prev)[act_ady_node->index] = min_node->node->index;
+                dist[act_ady_node->index] = new_root_dist;
+                prev[act_ady_node->index] = min_node->node->index;
             }
             act_ady_node = act_ady_node->next_ady_node;
         }
     }
     deleteFibHeap(fibonacciHeap);
+    *ptr_dist = dist;
+    *ptr_prev = prev;
+    min_tree->dist = ptr_dist;
+    min_tree->prev = ptr_prev;
     return min_tree;
 }
 
@@ -461,6 +452,7 @@ void executeExperiments(int seed_experiments) {
     vector<vector<vector<double>*>*> *results = calculateAllTimes(rand());
     deleteResultsExperiment(results);
 }
+
 /*
 int main() {
     int random_seed = 10;
